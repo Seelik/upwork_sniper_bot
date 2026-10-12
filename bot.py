@@ -105,32 +105,52 @@ async def cmd_hunt(message: Message):
   new_jobs_count = 0
   matched_jobs_count = 0
 
-  for job in jobs[:5]:
+  for job in jobs[:5]:  # Проверяем первые 5 вакансий
     job_id = job["id"]
 
     if is_job_exists(job_id):
       continue
 
     new_jobs_count += 1
+    title = job["title"]
+    description = job["description"]  # Полное описание
+    link = job["link"]
 
+    # Запрос к AI-фильтру со всем текстом
     ai_response = analyze_job_with_groq(
-        title=job["title"],
-        description=job["description"],
+        title=title,
+        description=description,
         user_filters=user_settings["filters"],
         api_key=GROQ_API_KEY,
     )
 
-    if "ПОДХОДИТ" in ai_response.upper():
-      matched_jobs_count += 1
-      add_job(job_id, job["title"], job["link"], job["published_at"])
+    print(f"\n[AI CHECK] Вакансия: {title}")
+    print(f"Ответ AI:\n{ai_response}")
 
-      text = (
-          f"🎯 **Найдена подходящая вакансия!**\n\n"
-          f"📌 **{job['title']}**\n\n"
-          f"🤖 **Вердикт ИИ:**\n{ai_response}\n\n"
-          f"🔗 [Ссылка на вакансию]({job['link']})"
-      )
-      await message.answer(text, disable_web_page_preview=True, parse_mode="Markdown")
+    is_matched = (
+        "ПОДХОДИТ" in ai_response.upper()
+        and "НЕ ПОДХОДИТ" not in ai_response.upper()
+    )
+    status_emoji = "🟢 ПОДХОДИТ" if is_matched else "🔴 ОТСЕЯНО"
+
+    # Экранируем опасные символы для безопасности разметки
+    safe_title = title.replace("*", "").replace("_", "").replace("`", "")
+    safe_desc = (
+        description[:250].replace("*", "").replace("_", "").replace("`", "")
+    )
+
+    text = (
+        f"{status_emoji}\n\n"
+        f"📌 **{safe_title}**\n\n"
+        f"📄 **Описание:** `{safe_desc}...`\n\n"
+        f"🤖 **Вердикт ИИ:**\n`{ai_response}`\n\n"
+        f"🔗 [Ссылка на вакансию]({link})"
+    )
+    await message.answer(text, disable_web_page_preview=True, parse_mode="Markdown")
+
+    if is_matched:
+      matched_jobs_count += 1
+      add_job(job_id, title, link, job["published_at"])
 
   await message.answer(
       f"✅ Поиск завершен!\n"
