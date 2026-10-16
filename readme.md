@@ -1,55 +1,92 @@
-# 🤖 Upwork Sniper Bot
+# Upwork Sniper Bot 2.0
 
-An intelligent Telegram bot designed to automatically scrape Upwork job listings, filter them using the **Groq AI SDK** (with lightweight LLMs), and instantly notify you via Telegram about relevant opportunities that match your precise skills and criteria.
+Telegram-бот на Python и **aiogram 3.x**. Он забирает свежие заказы с Upwork, мгновенно оценивает их через **Groq API** и оставляет только те, что совпадают с вашими критериями. Для подходящих вакансий бот готовит готовый **Cover Letter** на английском.
 
-## ✨ Features
+Поиск запускается вручную из Telegram. Повторные вакансии не приходят снова: каждая карточка сохраняется в локальной базе SQLite.
 
-- **Automated Scraping:** Uses `Playwright` and `BeautifulSoup` to fetch the latest job postings from Upwork RSS/search.
-- **AI-Powered Filtering:** Sends job titles and descriptions to the Groq API for smart evaluation based on your custom criteria.
-- **Duplicate Prevention:** SQLite database (`jobs.db`) tracks processed jobs to prevent duplicate notifications.
-- **Interactive Telegram Commands:** Easily update your search queries and AI filters on the fly.
+## Технологический стек
 
----
+- **Python 3.11**
+- **aiogram 3.x** — Telegram Bot API
+- **SQLite** — локальное хранение вакансий (`jobs.db`)
+- **Groq API** — фильтрация заказов и генерация сопроводительного письма
+- **Playwright** и **BeautifulSoup** — загрузка страницы поиска Upwork и разбор карточек вакансий
 
-## 🛠️ Tech Stack
+## Установка и запуск
 
-- **Python 3.10+**
-- **aiogram 3** (Telegram Bot framework)
-- **Playwright & BeautifulSoup** (Web scraping & parsing)
-- **Groq SDK** (Fast AI inference)
-- **SQLite** (Local storage)
+Нужны Python 3.11 и токены Telegram-бота и Groq.
 
----
+1. Клонируйте репозиторий:
 
-## 🚀 Quick Start
+```bash
+git clone https://github.com/Seelik/upwork_sniper_bot.git
+cd upwork_sniper_bot
+```
 
-1. Clone the repository:
-   ```bash
-   git clone [https://github.com/Seelik/upwork_sniper_bot.git](https://github.com/Seelik/upwork_sniper_bot.git)
-   cd upwork_sniper_bot
+2. Создайте виртуальное окружение и установите зависимости:
 
-Install dependencies:   pip install -r requirements.txt
-Run the bot:   python bot.py
+```bash
+python -m venv .venv
+```
 
+Windows (PowerShell):
 
+```powershell
+.venv\Scripts\Activate.ps1
+pip install aiogram groq beautifulsoup4 playwright python-dotenv
+playwright install chromium
+```
 
-📋 Example Templates for /set_query & /set_filter
-You can customize what jobs the bot hunts for using these templates depending on your seniority and focus:
+macOS / Linux:
 
+```bash
+source .venv/bin/activate
+pip install aiogram groq beautifulsoup4 playwright python-dotenv
+playwright install chromium
+```
 
-1. Junior / Quick Review Focus (Fast & Small Tasks)
-Query (/set_query): python
-Filter (/set_filter):
-Нужны заказы на Python: разработка Telegram ботов, парсинг сайтов, веб-скрейпинг, автоматизация и бэкенд на FastAPI. Бюджет значения не имеет, подходят любые мелкие и быстрые задачи для набора отзывов. Пропускай только фронтенд, дизайн и мобильную разработку.
+3. Создайте файл `.env` в корне проекта и укажите токены:
 
+```env
+TELEGRAM_TOKEN=your_telegram_bot_token
+GROQ_API_KEY=your_groq_api_key
+```
 
-2. Middle Backend Developer (APIs, Bots, Automation)
-Query (/set_query): python fastapi backend
-Filter (/set_filter):
-Ищу заказы на Python уровней Junior+ и Middle. Фокус на бэкенд-разработке (FastAPI, Flask, Django), создании Telegram/Discord ботов, веб-парсерах (BeautifulSoup, Selenium, Playwright) и интеграции сторонних API. Бюджет фиксированный или от $30/час. Пропускай жесткий фронтенд (React, Vue, Next.js) и AI-инженерию уровня Senior (LLM fine-tuning, RAG).
+`TELEGRAM_TOKEN` выдаёт [@BotFather](https://t.me/BotFather). `GROQ_API_KEY` берётся в [консоли Groq](https://console.groq.com/).
 
+4. Запустите бота из корня проекта:
 
-3. Senior AI & Automation Engineer (LLMs, Agents, Advanced APIs)
-Query (/set_query): ai agent python groq claude
-Filter (/set_filter):
-Интересуют сложные и высокооплачиваемые задачи для Senior-разработчика: проектирование бэкенда на Python, создание AI-агентов (LangChain, LlamaIndex, Claude API, Groq), автоматизация рабочих процессов (n8n, Make), интеграция LLM в бизнес-процессы. Бюджет высокий, долгосрочные проекты или сложные технические фиксы. Пропускай простые скрипты на 5 строк и низкобюджетные задачи.
+```bash
+python bot.py
+```
+
+В консоли появится сообщение, что бот запущен. В Telegram отправьте ему `/start`.
+
+## Архитектура
+
+| Файл | Роль |
+| --- | --- |
+| `bot.py` | Точка входа. Поднимает aiogram-диспетчер, клавиатуру и сценарии: поиск, настройки, списки одобренных и отсеянных вакансий, генерация Cover Letter. |
+| `parser.py` | Открывает страницу поиска Upwork через Playwright и собирает заголовок, ссылку и описание карточки через BeautifulSoup. |
+| `ai_filter.py` | Отправляет вакансию в Groq API и возвращает вердикт `ПОДХОДИТ` / `НЕ ПОДХОДИТ` с короткой причиной. Тот же вызов используется для текста отклика. |
+| `database.py` | Создаёт SQLite-базу `jobs.db`, проверяет, была ли вакансия уже обработана, и сохраняет статус, причину и описание. |
+
+Поток одного поиска:
+
+1. `bot.py` собирает URL поиска из текущего запроса пользователя.
+2. `parser.py` возвращает список карточек.
+3. Уже известные `job_id` пропускаются через `database.py`.
+4. Стоп-слова отсекают заведомо нерелевантные заказы до обращения к модели.
+5. `ai_filter.py` оценивает оставшиеся вакансии по тексту фильтра.
+6. Результат пишется в SQLite со статусом `matched` или `rejected`.
+
+## Работа в Telegram
+
+После `/start` доступны кнопки:
+
+- **Запустить поиск** — новая выборка по текущему запросу.
+- **Одобренные** / **Отсеянные** — последние 10 записей из базы и вердикт модели.
+- **Посмотреть настройки** — активные поисковый запрос и AI-фильтр.
+- **Изменить запрос** / **Изменить фильтр** — бот ждёт следующий текст и подставляет его в поиск или в промпт Groq.
+
+Под карточкой вакансии есть ссылка на Upwork и кнопка **Сгенерировать отклик**. Она просит Groq написать короткий Cover Letter на английском по заголовку и описанию заказа.
