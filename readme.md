@@ -1,53 +1,67 @@
-# Upwork Lead Sniper 2.0
+# 🤖 Upwork Job Monitor Telegram Bot
 
-A Telegram bot that finds fresh Upwork job posts, filters them with Groq AI against your criteria, and helps you respond faster with generated cover letters. Search runs on demand from Telegram—no background scraping loops.
+An **async Python Telegram bot** for on-demand **Upwork job monitoring**, **AI-powered filtering**, and **instant proposal drafts**—delivered straight to your chat.
 
-![Upwork Lead Sniper UI](docs/ui.png)
+![Bot UI preview](docs/ui.png)
 
-## Key Features (v2.0.1)
+---
 
-- **Smart query normalization** — Upwork treats plain spaces as AND. Multi-word queries are auto-expanded with `OR` unless you already use `OR`, `AND`, or quotes.
-- **Pre-filter (stop words)** — Blacklisted keywords are rejected before any LLM call to save API usage and noise.
-- **Groq AI filtering** — Each job is scored against your custom filter prompt (`ПОДХОДИТ` / `НЕ ПОДХОДИТ` with a short reason).
-- **SQLite deduplication** — Processed jobs are stored in `jobs.db` so you never get duplicate notifications for the same listing.
-- **Cover letter generation** — One-tap English proposal draft for matched jobs via inline button.
+## ✨ Key Features
 
-## Tech Stack
+- 🔍 **Real-time Upwork monitoring** — Playwright loads fresh search results when you tap **Start Search**.
+- 🧠 **AI-powered evaluation** — LLM scoring via **Groq API** (OpenAI-compatible chat completions).
+- 🌍 **Multi-language UI & AI analysis** — English / Russian i18n (`locales/`) with per-user language in SQLite `user_prefs`; filter **verdict & reason** follow the user's language.
+- 📝 **Instant cover letter generation** — always **English** (Upwork-ready), regardless of UI language.
+- ⚡ **Async architecture** — `asyncio` + **aiogram 3** handlers, non-blocking search flow.
+- 🛡️ **Smart pre-filter** — stop-word rejection before LLM calls.
+- 🔁 **Query normalization** — auto-`OR` for multi-word Upwork queries (spaces = AND on Upwork).
+- 💾 **SQLite deduplication** — track matched / rejected / applied jobs without duplicates.
+- 📨 **Job workflow** — mark **Applied** or **Not a fit** from matched cards.
 
-- **Python 3.11**
-- **aiogram 3**
-- **Playwright**
-- **BeautifulSoup**
-- **SQLite**
-- **Groq API**
+---
 
-## Architecture
+## 🛠 Tech Stack
 
-End-to-end flow for one search:
+| Layer | Technology |
+| --- | --- |
+| Language | **Python 3.11+** |
+| Runtime | **Asyncio** |
+| Bot framework | **aiogram 3** |
+| Scraping | **Playwright**, **BeautifulSoup** |
+| Database | **SQLite** (`jobs.db`, `user_prefs`) |
+| AI | **Groq API** (LLM; swap-friendly for OpenAI/Gemini-style providers) |
+| Config | **python-dotenv** (`.env`) |
+| Deploy | **Docker** *(optional — add your own `Dockerfile`)* |
+
+---
+
+## 🏗 Architecture
 
 ```text
 Telegram Bot → Parser → DB Check → Pre-filter → Groq AI → UI
 ```
 
-| Step | Module | What happens |
+| Step | Module | Description |
 | --- | --- | --- |
-| Telegram Bot | `bot.py` | User triggers search; query is normalized and sent to the parser. |
-| Parser | `parser.py` | Playwright loads Upwork search HTML; BeautifulSoup extracts title, link, and description. |
-| DB Check | `database.py` | Skip jobs already stored in SQLite. |
-| Pre-filter | `bot.py` | Drop listings that match stop-word rules. |
-| Groq AI | `ai_filter.py` | Evaluate remaining jobs; persist verdict and reason. |
-| UI | `bot.py` | Show summary, matched/rejected lists, settings, and cover-letter actions. |
+| 1 | `bot.py` | Telegram UI, i18n, orchestration |
+| 2 | `parser.py` | Upwork HTML fetch & parse |
+| 3 | `database.py` | Duplicate check & persistence |
+| 4 | `bot.py` | Keyword pre-filter |
+| 5 | `ai_filter.py` | Localized AI verdict + English cover letters |
+| 6 | `bot.py` | Lists, inline actions, keyboards |
 
-## Setup
+---
 
-### 1. Clone
+## 🚀 Quick Start
+
+### 1️⃣ Clone
 
 ```bash
 git clone https://github.com/Seelik/upwork_sniper_bot.git
 cd upwork_sniper_bot
 ```
 
-### 2. Virtual environment and dependencies
+### 2️⃣ Virtual environment & dependencies
 
 ```bash
 python -m venv .venv
@@ -69,11 +83,7 @@ pip install aiogram groq beautifulsoup4 playwright python-dotenv
 playwright install chromium
 ```
 
-> Playwright must download Chromium once per environment. If search returns no jobs and logs mention a missing browser executable, run `playwright install chromium` again.
-
-### 3. Environment variables
-
-Copy the example file and fill in your tokens:
+### 3️⃣ Environment (`.env`)
 
 ```bash
 cp .env.example .env
@@ -84,39 +94,36 @@ TELEGRAM_TOKEN=your_telegram_bot_token
 GROQ_API_KEY=your_groq_api_key
 ```
 
-- **Telegram:** create a bot via [@BotFather](https://t.me/BotFather).
-- **Groq:** create an API key in the [Groq Console](https://console.groq.com/).
+| Variable | Where to get it |
+| --- | --- |
+| `TELEGRAM_TOKEN` | [@BotFather](https://t.me/BotFather) |
+| `GROQ_API_KEY` | [Groq Console](https://console.groq.com/) |
 
-Never commit `.env`—it is listed in `.gitignore`.
+> ⚠️ Never commit `.env` — it is listed in `.gitignore`.
 
-### 4. Run
+### 4️⃣ Run
 
 ```bash
 python bot.py
 ```
 
-Open your bot in Telegram and send `/start`.
+Send **`/start`** in Telegram → choose **English 🇬🇧** or **Русский 🇷🇺** → use the reply keyboard.
 
-## Telegram usage
+---
 
-| Action | Description |
+## 📁 Project Layout
+
+| Path | Purpose |
 | --- | --- |
-| **Start search** | Fetch and analyze new jobs for the current query. |
-| **Matched / Rejected** | Last 10 entries from the database with AI verdict. |
-| **View settings** | Current search query and AI filter text. |
-| **Change query / filter** | Send new text; the bot updates in-memory settings. |
-| **Generate cover letter** | Inline button on a job card—Groq drafts a short English proposal. |
+| `bot.py` | Entry point, handlers, i18n wiring |
+| `parser.py` | Upwork scraper |
+| `ai_filter.py` | Groq filtering (localized) & cover letters (EN) |
+| `database.py` | SQLite jobs + `user_prefs` |
+| `locales/en.py`, `locales/ru.py` | UI strings |
+| `jobs.db` | Created at runtime (gitignored) |
 
-## Project layout
+---
 
-| File | Role |
-| --- | --- |
-| `bot.py` | Entry point, handlers, keyboards, search orchestration |
-| `parser.py` | Upwork HTML scraping (Playwright + BeautifulSoup) |
-| `ai_filter.py` | Groq SDK integration for filtering and cover letters |
-| `database.py` | SQLite schema and job persistence |
-| `jobs.db` | Local database (created at runtime; ignored by Git) |
+## 📜 License
 
-## License
-
-Use and modify for your own freelance workflow. Upwork’s terms of service apply to how you access their site and data.
+Use and adapt for your freelance workflow. Comply with **Upwork Terms of Service** when accessing their platform.

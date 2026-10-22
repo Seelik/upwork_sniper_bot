@@ -1,0 +1,61 @@
+TEXTS = {
+    "choose_language": "Выберите язык интерфейса / Choose your language:",
+    "welcome": (
+        "Привет! Я **Upwork Sniper Bot 2.0**.\n\n"
+        "Поиск настроен и готов к работе: жми «Запустить поиск», "
+        "а результаты смотри по кнопкам ниже!"
+    ),
+    "language_prompt": "Выберите язык интерфейса:",
+    "language_updated": "✅ Язык обновлён",
+    "btn_start_search": "🔍 Запустить поиск",
+    "btn_matched": "🟢 Одобренные",
+    "btn_rejected": "🔴 Отсеянные",
+    "btn_applied": "📨 Поданные заявки",
+    "btn_settings": "🛠 Посмотреть настройки",
+    "btn_change_query": "⚙️ Изменить запрос",
+    "btn_change_filter": "🤖 Изменить фильтр",
+    "btn_language": "🌐 Язык / Language",
+    "btn_job_link": "🔗 Ссылка на вакансию",
+    "btn_cover_letter": "📝 Сгенерировать отклик",
+    "btn_mark_applied": "✅ Подал заявку",
+    "btn_mark_reject": "❌ Не подходит",
+    "settings_title": "🛠 **Текущие настройки:**",
+    "settings_query": "🔎 **Поисковый запрос:**",
+    "settings_filter": "🤖 **Фильтр AI:**",
+    "prompt_new_query": "✍️ Отправь мне новый поисковый запрос (например: `python OR html`):",
+    "prompt_new_filter": "✍️ Отправь мне новые критерии для AI-фильтра:",
+    "query_updated": "✅ Поисковый запрос обновлен на: `{query}`",
+    "filter_updated": "✅ Фильтры AI обновлены на:\n`{filters}`",
+    "no_matched": "📭 В базе пока нет одобренных вакансий.",
+    "matched_header": "🟢 **Ваши одобренные вакансии:**",
+    "matched_verdict": "🤖 **Вердикт ИИ:**",
+    "no_rejected": "📭 В базе пока нет отсеянных вакансий.",
+    "rejected_header": "🔴 **Последние отсеянные вакансии:**",
+    "rejected_reason": "❌ **Причина:**",
+    "no_applied": "📭 Пока нет поданных заявок.",
+    "applied_header": "📨 **Поданные заявки:**",
+    "applied_status": "✅ **Статус:** заявка подана",
+    "applied_verdict": "🤖 **Вердикт ИИ:**",
+    "hunt_searching": "🔍 Ищу свежие вакансии по запросу `{query}`",
+    "hunt_upwork_query": "↪️ На Upwork: `{upwork_query}`",
+    "hunt_failed": (
+        "❌ Не удалось найти вакансии или Upwork временно ограничил доступ.\n\n"
+        "💡 Upwork по умолчанию ищет **все** слова сразу (AND). "
+        "Используйте `OR` между ключевыми словами или короткий запрос — "
+        "бот автоматически подставляет OR, если вы не указали операторы."
+    ),
+    "hunt_done_title": "✅ **Поиск завершен!**",
+    "hunt_done_new": "• Проверено новых: {count}",
+    "hunt_done_prefilter": "• Отсечено пре-фильтром: {count}",
+    "hunt_done_matched": "• Подходит по версии AI: {count}",
+    "hunt_done_footer": "👇 Нажми «🟢 Одобренные» или «🔴 Отсеянные», чтобы посмотреть результаты.",
+    "prefilter_reason": "Отсечено пре-фильтром (стоп-слова)",
+    "job_not_found": "❌ Вакансия не найдена в базе.",
+    "job_data_not_found": "❌ Не удалось найти данные этой вакансии в базе.",
+    "applied_toast": "✅ Заявка отмечена как поданная",
+    "reject_toast": "❌ Убрано из одобренных",
+    "cover_generating": "⏳ Генерирую идеальный отклик...",
+    "cover_ready": "📝 **Готовый отклик на английском для «{title}»:**\n\n{cover}",
+    "log_bot_started": "Бот запущен и готов к работе...",
+    "log_missing_env": "Задайте TELEGRAM_TOKEN и GROQ_API_KEY в файле .env в корне проекта.",
+}
