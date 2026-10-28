@@ -56,5 +56,5 @@ TEXTS = {
     "cover_generating": "⏳ Generating cover letter...",
     "cover_ready": "📝 **Cover letter in English for «{title}»:**\n\n{cover}",
     "log_bot_started": "Bot is running and ready.",
-    "log_missing_env": "Set TELEGRAM_TOKEN and GROQ_API_KEY in the .env file at the project root.",
+    "log_missing_env": "Set BOT_TOKEN and GROQ_API_KEY in the .env file at the project root.",
 }

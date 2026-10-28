@@ -88,13 +88,13 @@ cp .env.example .env
 Edit `.env`:
 
 ```env
-TELEGRAM_TOKEN=your_telegram_bot_token
+BOT_TOKEN=your_telegram_bot_token_here
 GROQ_API_KEY=your_groq_api_key
 ```
 
 | Variable | Source |
 | --- | --- |
-| `TELEGRAM_TOKEN` | [@BotFather](https://t.me/BotFather) |
+| `BOT_TOKEN` | [@BotFather](https://t.me/BotFather) |
 | `GROQ_API_KEY` | [Groq Console](https://console.groq.com/) |
 
 > Never commit `.env`. It is listed in `.gitignore`.
@@ -154,7 +154,7 @@ On each push/PR to `main` or `master`:
 - `compileall` syntax check  
 - **Ruff** lint  
 - **unittest** suite  
-- Optional smoke step if `TELEGRAM_TOKEN` and `GROQ_API_KEY` are set in **GitHub → Settings → Secrets and variables → Actions**
+- Optional smoke step if `BOT_TOKEN` and `GROQ_API_KEY` are set in **GitHub → Settings → Secrets and variables → Actions**
 
 ---
 

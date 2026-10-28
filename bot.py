@@ -31,7 +31,7 @@ from parser import parse_upwork_rss
 
 load_dotenv()
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
 user_settings = {
@@ -514,10 +514,10 @@ async def callback_generate_cover(callback: CallbackQuery):
 
 
 async def main():
-    if not TELEGRAM_TOKEN or not GROQ_API_KEY:
+    if not BOT_TOKEN or not GROQ_API_KEY:
         raise SystemExit(t("en", "log_missing_env"))
     init_db()
-    bot = Bot(token=TELEGRAM_TOKEN)
+    bot = Bot(token=BOT_TOKEN)
     logging.info(t("en", "log_bot_started"))
     await dp.start_polling(bot)
 

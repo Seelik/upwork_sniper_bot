@@ -57,5 +57,5 @@ TEXTS = {
     "cover_generating": "⏳ Генерирую идеальный отклик...",
     "cover_ready": "📝 **Готовый отклик на английском для «{title}»:**\n\n{cover}",
     "log_bot_started": "Бот запущен и готов к работе...",
-    "log_missing_env": "Задайте TELEGRAM_TOKEN и GROQ_API_KEY в файле .env в корне проекта.",
+    "log_missing_env": "Задайте BOT_TOKEN и GROQ_API_KEY в файле .env в корне проекта.",
 }

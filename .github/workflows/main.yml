@@ -10,7 +10,7 @@ jobs:
   lint-and-test:
     runs-on: ubuntu-latest
     env:
-      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
 
     steps:
@@ -41,5 +41,5 @@ jobs:
         run: test -f .env.example
 
       - name: Optional secrets smoke check
-        if: env.TELEGRAM_TOKEN != '' && env.GROQ_API_KEY != ''
-        run: python -c "import os; assert os.getenv('TELEGRAM_TOKEN'); assert os.getenv('GROQ_API_KEY'); print('GitHub Secrets are wired.')"
+        if: env.BOT_TOKEN != '' && env.GROQ_API_KEY != ''
+        run: python -c "import os; assert os.getenv('BOT_TOKEN'); assert os.getenv('GROQ_API_KEY'); print('GitHub Secrets are wired.')"
