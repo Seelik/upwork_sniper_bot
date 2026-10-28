@@ -1,0 +1,5 @@
+aiogram>=3.4,<4
+groq>=0.9
+beautifulsoup4>=4.12
+playwright>=1.40
+python-dotenv>=1.0

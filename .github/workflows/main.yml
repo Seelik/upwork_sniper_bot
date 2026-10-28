@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    env:
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Syntax check
+        run: python -m compileall bot.py ai_filter.py database.py parser.py locales tests
+
+      - name: Lint
+        run: ruff check bot.py ai_filter.py database.py parser.py locales tests
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests -p "test_*.py" -v
+
+      - name: Verify env template
+        run: test -f .env.example
+
+      - name: Optional secrets smoke check
+        if: env.TELEGRAM_TOKEN != '' && env.GROQ_API_KEY != ''
+        run: python -c "import os; assert os.getenv('TELEGRAM_TOKEN'); assert os.getenv('GROQ_API_KEY'); print('GitHub Secrets are wired.')"
